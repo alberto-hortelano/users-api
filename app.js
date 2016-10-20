@@ -7,6 +7,7 @@ var marked = require('marked');
 var fs = require('fs');
 var logger = require('winston');
 var userController = require('./controllers/users');
+var bodyParser = require('body-parser');
 
 var app = express();
 
@@ -14,6 +15,8 @@ var app = express();
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(morgan('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
@@ -41,9 +44,15 @@ if (require.main === module) {
   // If require'd (e.g. in tests), let these tests establish a DB connection themselves
   mongoose.connect('mongodb://localhost/users');
 
-  // Only listen when app.js is run - acceptance tests will listen on another port
-  app.listen(8000, function() {
-    logger.info('Listening at http://localhost:8000 - see here for API docs');
+  var db = mongoose.connection;
+  // Listen for errors on connection
+  db.on('error', console.error.bind(console, 'connection error:'));
+  // Start Listening on connection ok
+  db.once('open', function() {
+    // Only listen when app.js is run - acceptance tests will listen on another port
+    app.listen(8000, function() {
+      logger.info('Listening at http://localhost:8000 - see here for API docs');
+    });
   });
 }
 
