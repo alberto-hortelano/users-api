@@ -42,19 +42,14 @@ router.get('/:id', function(req, res) {
 // POST /users
 // Create new user
 router.post('/', function(req, res) {
-  console.log('Start User creation');
   var newUser = new User(req.body);
   User.create(newUser, function (err, user) {
-    console.log(err);
     if (err) {
       return res.status(500).json({
-        error: "Error reading user: " + err
+        error: "Error creating user: " + err
       });
     }
 
-    if (!user) {
-      //return res.status(404).end();
-    }
     res.json(user);
   });
 });
@@ -100,7 +95,6 @@ router.put('/:id', function(req, res) {
 // DELETE /users
 // Delete an existing users
 router.delete('/:id', function(req, res) {
-  console.log('Deleting User',req.params.id);
   User.remove({
     _id: req.params.id
   }, function(err, user) {
@@ -112,7 +106,7 @@ router.delete('/:id', function(req, res) {
     if (!user) {
       return res.status(404).end();
     }
-    console.log('Deleted!');
+
     res.json(user);
   });
 });
