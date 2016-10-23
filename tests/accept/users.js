@@ -30,13 +30,13 @@ describe('Users', function() {
   describe('/GET users', function() {
     it('should return a list of users', function(done) {
       chai.request(url)
-        .get('/users')
-        .end(function(err, res) {
-          res.body.should.be.a('array');
-          res.should.have.status(200);
-          res.body.length.should.be.eql(100);
-          done();
-        });
+      .get('/users')
+      .end(function(err, res) {
+        res.body.should.be.a('array');
+        res.should.have.status(200);
+        res.body.length.should.be.eql(100);
+        done();
+      });
     });
   });
 
@@ -48,13 +48,50 @@ describe('Users', function() {
 
         // Read this user by id
         chai.request(url)
-          .get('/users/' + id)
-          .end(function(err, res) {
-            res.should.have.status(200);
-            expect(res.body).to.be.a('object');
-            expect(res.body.name.first).to.be.a('string');
-            done();
-          });
+        .get('/users/' + id)
+        .end(function(err, res) {
+          res.should.have.status(200);
+          expect(res.body).to.be.a('object');
+          expect(res.body.name.first).to.be.a('string');
+          done();
+        });
+      });
+    });
+  });
+
+  describe('/POST users', function() {
+    it('should create a new user', function(done) {
+      chai.request(url)
+      .post('/users')
+      .send({username:'new user', password: 'password'})
+      .end(function(err, res) {
+        logger.info(res.body);
+        res.body.should.be.a('object');
+        res.should.have.status(200);
+        res.body.username.should.be.eql('new user');
+        done();
+      });
+    });
+    it('should return state 500 if not username or password are passed in', function(done) {
+      chai.request(url)
+      .post('/users')
+      .send({name:'new name', password: 'password'})
+      .end(function(err, res) {
+        res.should.have.status(500);
+        res.body.should.be.a('object');
+        res.body.should.have.property('error');
+        done();
+      });
+    });
+    it('should return state 500 if wrong parameters are passed in', function(done) {
+      chai.request(url)
+      .post('/users')
+      .send({username: 'new user',password: 'aa', name: {a:1}})
+      .end(function(err, res) {
+        console.log(res.body);
+        res.body.should.be.a('object');
+        res.should.have.status(500);
+        done();
       });
     });
   });

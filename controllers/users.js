@@ -2,10 +2,12 @@ var User = require('../models/user');
 var express = require('express');
 var router = express.Router();
 
+express().use('/', router);
 
 // GET /users
 // Get a list of users
 router.get('/', function(req, res) {
+  console.log('router.get');
   User.find({}, function(err, users) {
     if (err) {
       return res.status(500).json({
@@ -41,8 +43,8 @@ router.get('/:id', function(req, res) {
 // Create new user
 router.post('/', function(req, res) {
   console.log('Start User creation');
-  console.log(req.body);
-  User.create(req.body, function (err, user) {
+  var newUser = new User(req.body);
+  User.create(newUser, function (err, user) {
     console.log(err);
     if (err) {
       return res.status(500).json({
@@ -53,9 +55,6 @@ router.post('/', function(req, res) {
     if (!user) {
       //return res.status(404).end();
     }
-
-    console.log('create User :)');
-    console.log(JSON.stringify(user));
     res.json(user);
   });
 });
@@ -88,10 +87,9 @@ router.put('/:id', function(req, res) {
         error: "Error reading user: " + err
       });
     }
-      console.log(user);
 
     if (!user) {
-      //return res.status(404).end();
+      return res.status(404).end();
     }
 
     console.log('Pre Update User ',user);
@@ -120,37 +118,3 @@ router.delete('/:id', function(req, res) {
 });
 
 module.exports = router;
-
-
-/*
-
-  "gender": "female",
-  "name": {
-    "title": "miss",
-    "first": "allie",
-    "last": "willis"
-  },
-  "location": {
-    "street": "7135 the crescent",
-    "city": "Leixlip",
-    "state": "colorado",
-    "zip": 37191
-  },
-  "email": "allie.willis@example.com",
-  "username": "crazybear293",
-  "password": "3232",
-  "salt": "UVMKO1Tj",
-  "md5": "b7441c556f250fe6ebb3367ba708d4b6",
-  "sha1": "fc79c95d01ca351efdf283331f39f2384db1dd78",
-  "sha256": "999afe92c680c6d74412ff438c8d0901028805caf66aeff536e0eed52e758d55",
-  "registered": 1216343814,
-  "dob": 253933290,
-  "phone": "041-379-5675",
-  "cell": "081-471-3648",
-  "PPS": "9408385T",
-  "picture": {
-    "large": "https://randomuser.me/api/portraits/women/19.jpg",
-    "medium": "https://randomuser.me/api/portraits/med/women/19.jpg",
-    "thumbnail": "https://randomuser.me/api/portraits/thumb/women/19.jpg"
-  }
- */
